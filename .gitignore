@@ -1,0 +1,28 @@
+## Build results
+[Bb]in/
+[Oo]bj/
+{Mm}odel/
+
+## Visual Studio cache/options
+.vs/
+
+## Publish folders
+[Pp]ublish/
+publish/
+
+
+## User-specific files
+*.user
+*.suo
+
+## NuGet
+*.nupkg
+packages/
+
+# Settings
+appsettings.Development.json
+appsettings.*.json
+!appsettings.json
+
+# VS code
+.vscode/
