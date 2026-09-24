@@ -136,7 +136,14 @@ builder.Services.AddOpenApiDocument(config =>
     );
 });
 
-builder.Services.AddOutputCache();
+
+// ── Cache for Authenticated Get requests ─────────────────────────────────────
+builder.Services.AddOutputCache(o =>
+{
+    o.SizeLimit = 100 * 1024 * 1024;         // total cache size, tune to your instance memory
+    o.MaximumBodySize = 8 * 1024 * 1024;     // don't cache huge responses
+});
+
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddAzureWebAppDiagnostics();
@@ -150,7 +157,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowMobile");
-app.UseOutputCache();
 if (!app.Environment.IsDevelopment())
 {
     app.UseHttpsRedirection();
@@ -162,6 +168,7 @@ if (!app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
+app.UseOutputCache();
 
 // ── Endpoints ────────────────────────────────────────────────────────────────
 app.RegisterDataEndpoints();
@@ -172,6 +179,7 @@ app.RegisterQuestionEndpoints();
 app.RegisterDataRequestEndpoints();
 app.RegisterSearchEndpoints();
 app.RegisterFeedbackEndpoints();
+app.RegisterAdminEndpoints();
 
 app.Run();
 

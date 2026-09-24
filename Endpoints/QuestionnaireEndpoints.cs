@@ -10,8 +10,7 @@ namespace QuestionnaireApi.Endpoints
         public static void RegisterQuestionEndpoints(this WebApplication app)
         {
             var questionnaire = app.MapGroup("/questionnaire");
-            questionnaire.MapGet("/dailyquestion", GetQuestionOfTheDay).CacheOutput(builder => builder.Expire(TimeSpan.FromMinutes(30))
-                                       .SetVaryByQuery("userId", "numQuestions"));
+            questionnaire.MapGet("/dailyquestion", GetQuestionOfTheDay);
             questionnaire.MapGet("/random", GetRandomQuestion);
             questionnaire.MapPost("/userquestionstate", UpdateUserQuestionState);
         }

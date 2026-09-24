@@ -10,14 +10,17 @@ namespace SunflowerApi.Endpoints
         public static void RegisterDataEndpoints(this WebApplication app)
         {
             var charts = app.MapGroup("/chart");
-            charts.MapGet("/getData", GetChartData).CacheOutput(builder => builder.Expire(TimeSpan.FromMinutes(5))
-                                       .SetVaryByQuery("database", "geos", "variables", "startPeriod", "endPeriod"));
-            charts.MapGet("/allCharts", GetSelectedCharts).CacheOutput(builder => builder.Expire(TimeSpan.FromMinutes(10))
-                                       .SetVaryByQuery("category", "search", "lang", "afterId", "limit"));
-            charts.MapGet("/recommended", GetRecommendedCharts).CacheOutput(builder => builder.Expire(TimeSpan.FromMinutes(15))
-                                       .SetVaryByQuery("lang", "excludeSeenDays", "lastSimilarity", "afterId"));
-            charts.MapGet("/random", GetRandomCharts).CacheOutput(builder => builder.Expire(TimeSpan.FromMinutes(15))
-                                       .SetVaryByQuery("seed", "lang", "categories", "lastSortKey", "afterId"));
+            charts.MapGet("/getData", GetChartData)
+            .CacheShared(TimeSpan.FromHours(6), CacheTags.ChartData, "database", "geos", "variables", "startPeriod", "endPeriod");
+
+            charts.MapGet("/allCharts", GetSelectedCharts)
+            .CacheShared(TimeSpan.FromMinutes(10), CacheTags.ChartLists, "category", "search", "lang", "afterId", "limit");
+
+            charts.MapGet("/random", GetRandomCharts)
+            .CacheShared(TimeSpan.FromMinutes(10), CacheTags.ChartLists, "seed", "lang", "categories", "lastSortKey", "afterId");
+
+            // NOT cached: user-specific
+            charts.MapGet("/recommended", GetRecommendedCharts);
 
             // ----------------------------
             // Chart data

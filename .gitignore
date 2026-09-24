@@ -10,6 +10,9 @@
 [Pp]ublish/
 publish/
 
+## Admin
+[Aa]dmin/
+
 
 ## User-specific files
 *.user

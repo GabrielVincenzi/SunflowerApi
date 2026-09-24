@@ -8,8 +8,7 @@ public static class DictionaryEndpoints
         var dict = app.MapGroup("/chart");
 
         dict.MapGet("/variableLabels", GetVariableLabels)
-            .CacheOutput(builder => builder.Expire(TimeSpan.FromHours(6))
-                .SetVaryByQuery("table", "lang", "vars"));
+        .CacheShared(TimeSpan.FromHours(6), CacheTags.ChartData, "table", "lang", "vars");
 
         static async Task<IResult> GetVariableLabels(
             [FromQuery] string table,

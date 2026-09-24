@@ -20,9 +20,14 @@ namespace SunflowerApi.Services
             return _repository.GetDbAsync(name, ct);
         }
 
-        public Task<List<CategoryDto>> GetCategoriesAsync(string lang, CancellationToken ct)
+        public Task<List<FilterOptionDto>> GetCategoriesAsync(string lang, CancellationToken ct)
         {
             return _repository.GetCategoriesAsync(lang, ct);
+        }
+
+        public Task<List<FilterOptionDto>> GetSourcesAsync(string lang, CancellationToken ct)
+        {
+            return _repository.GetSourcesAsync(lang, ct);
         }
     }
 }

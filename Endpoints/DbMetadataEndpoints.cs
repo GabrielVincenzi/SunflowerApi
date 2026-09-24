@@ -7,8 +7,14 @@ public static class DbEndpoints
     {
         var dbItems = app.MapGroup("/db");
 
-        dbItems.MapGet("/", GetDbMetadata).CacheOutput(p => p.Expire(TimeSpan.FromHours(1))); ;
-        dbItems.MapGet("/categories", GetCategories).CacheOutput(p => p.Expire(TimeSpan.FromHours(1)));
+        dbItems.MapGet("/", GetDbMetadata)
+        .CacheShared(TimeSpan.FromHours(6), CacheTags.DbFilters);
+
+        dbItems.MapGet("/categories", GetCategories)
+        .CacheShared(TimeSpan.FromHours(6), CacheTags.DbFilters, "lang");
+
+        dbItems.MapGet("/sources", GetSources)
+        .CacheShared(TimeSpan.FromHours(6), CacheTags.DbFilters, "lang");
     }
 
     private static async Task<IResult> GetDbMetadata(
@@ -33,5 +39,14 @@ public static class DbEndpoints
     {
         var categories = await service.GetCategoriesAsync(lang, ct);
         return Results.Ok(categories);
+    }
+
+    private static async Task<IResult> GetSources(
+        [FromQuery] string lang,
+        [FromServices] IDbMetadataService service,
+        CancellationToken ct)
+    {
+        var sources = await service.GetSourcesAsync(lang, ct);
+        return Results.Ok(sources);
     }
 }

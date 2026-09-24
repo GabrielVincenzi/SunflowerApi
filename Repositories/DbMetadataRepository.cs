@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using SunflowerApi.Data;
 using SunflowerApi.Models;
 
@@ -24,19 +25,8 @@ namespace SunflowerApi.Repositories
                 .FirstOrDefaultAsync(d => d.DbName == name, ct);
         }
 
-        public async Task<List<CategoryDto>> GetCategoriesAsync(string lang, CancellationToken ct)
-        {
-            return await _categoryContext.Set<Category>()
-                .AsNoTracking()
-                .Where(c => c.Description != null)
-                .Where(c => c.Lang == lang)
-                .OrderBy(c => c.Description)
-                .Select(c => new CategoryDto(c.Name, c.Description!))
-                .ToListAsync(ct);
-        }
-
         public async Task<Dictionary<string, string?>> GetSourcesByDbNamesAsync(
-    IEnumerable<string> dbNames, CancellationToken ct)
+        IEnumerable<string> dbNames, CancellationToken ct)
         {
             var names = dbNames.Distinct().ToArray();
             if (names.Length == 0) return new Dictionary<string, string?>();
@@ -46,5 +36,20 @@ namespace SunflowerApi.Repositories
                 .Where(d => names.Contains(d.DbName))
                 .ToDictionaryAsync(d => d.DbName, d => d.DbSource, ct);
         }
+
+        public Task<List<FilterOptionDto>> GetCategoriesAsync(string lang, CancellationToken ct)
+        => GetOptionsAsync<Category>(lang, ct);
+
+        public Task<List<FilterOptionDto>> GetSourcesAsync(string lang, CancellationToken ct)
+            => GetOptionsAsync<Source>(lang, ct);
+
+        private Task<List<FilterOptionDto>> GetOptionsAsync<T>(string lang, CancellationToken ct)
+            where T : class, ILocalizedOption
+            => _categoryContext.Set<T>()
+                .AsNoTracking()
+                .Where(o => o.Lang == lang && o.Description != null)
+                .OrderBy(o => o.Description)
+                .Select(o => new FilterOptionDto(o.Name, o.Description!))
+                .ToListAsync(ct);
     }
 }
