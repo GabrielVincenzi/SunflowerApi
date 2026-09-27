@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace SunflowerApi.Models
 {
@@ -12,6 +13,9 @@ namespace SunflowerApi.Models
     [Table("categories", Schema = "public")]
     public class Category : ILocalizedOption
     {
+        [Key]
+        [Column("id")]
+        public long Id { get; set; }
         [Column("name")] public string Name { get; set; } = string.Empty;
         [Column("description")] public string? Description { get; set; }
         [Column("lang")] public string Lang { get; set; } = string.Empty;
@@ -20,6 +24,9 @@ namespace SunflowerApi.Models
     [Table("sources", Schema = "public")]
     public class Source : ILocalizedOption
     {
+        [Key]
+        [Column("id")]
+        public long Id { get; set; }
         [Column("name")] public string Name { get; set; } = string.Empty;
         [Column("description")] public string? Description { get; set; }
         [Column("lang")] public string Lang { get; set; } = string.Empty;

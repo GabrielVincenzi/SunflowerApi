@@ -8,11 +8,11 @@ namespace SunflowerApi.Repositories
     public class DbMetadataRepository : IDbMetadataRepository
     {
         private readonly DbMetadataDbContext _metadataContext;
-        private readonly CategoryDbContext _categoryContext;
+        private readonly FilterDbContext _categoryContext;
 
         public DbMetadataRepository(
             DbMetadataDbContext metadataContext,
-            CategoryDbContext categoryContext)
+            FilterDbContext categoryContext)
         {
             _metadataContext = metadataContext;
             _categoryContext = categoryContext;

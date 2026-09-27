@@ -23,7 +23,7 @@ builder.Services.AddDbContextPool<UserEventsDbContext>(options =>
     options.UseNpgsql(connStr));
 builder.Services.AddDbContextPool<DbMetadataDbContext>(options =>
     options.UseNpgsql(connStr));
-builder.Services.AddDbContextPool<CategoryDbContext>(options =>
+builder.Services.AddDbContextPool<FilterDbContext>(options =>
     options.UseNpgsql(connStr));
 builder.Services.AddDbContextPool<TranslationDbContext>(options =>
     options.UseNpgsql(connStr));
