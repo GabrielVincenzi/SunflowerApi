@@ -82,7 +82,7 @@ public class SearchRepository : ISearchRepository
                 SELECT
                     c.id, c.chart_id, c.chart_type, c.vars, c.db_name,
                     ct.title, ct.description, ct.category,
-                    d.db_source AS source
+                    d.db_source AS db_source
                 FROM public.charts c
                 LEFT JOIN public.charts_text ct
                     ON ct.chart_id = c.chart_id AND ct.lang = @lang
@@ -94,7 +94,7 @@ public class SearchRepository : ISearchRepository
 
         if (afterId.HasValue) sql += " AND id > @afterId";
         if (!string.IsNullOrWhiteSpace(category)) sql += " AND category ILIKE @category";
-        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(source) = LOWER(@source)";
+        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(db_source) = LOWER(@source)";
         sql += " ORDER BY id ASC LIMIT @limit;";
 
         var rows = await ExecuteRowsAsync(sql, cmd =>
@@ -103,6 +103,7 @@ public class SearchRepository : ISearchRepository
             cmd.Parameters.AddWithValue("limit", fetchCount);
             if (afterId.HasValue) cmd.Parameters.AddWithValue("afterId", afterId.Value);
             if (!string.IsNullOrWhiteSpace(category)) cmd.Parameters.AddWithValue("category", $"%{category}%");
+            if (!string.IsNullOrWhiteSpace(source)) cmd.Parameters.AddWithValue("source", source);
         }, ct);
 
         var hasMore = rows.Count > limit;
@@ -128,7 +129,7 @@ public class SearchRepository : ISearchRepository
                 SELECT
                     c.id, c.chart_id, c.chart_type, c.vars, c.db_name,
                     ct.title, ct.description, ct.category,
-                    d.db_source AS source
+                    d.db_source AS db_source
                 FROM public.charts c
                 LEFT JOIN public.charts_text ct
                        ON ct.chart_id = c.chart_id AND ct.lang = @lang
@@ -148,7 +149,7 @@ public class SearchRepository : ISearchRepository
                 WHERE (title ILIKE @searchAny ESCAPE '\' OR description ILIKE @searchAny ESCAPE '\')";
 
         if (!string.IsNullOrWhiteSpace(category)) sql += " AND category ILIKE @category";
-        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(source) = LOWER(@source)";
+        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(db_source) = LOWER(@source)";
 
         sql += @"
             )
@@ -165,6 +166,7 @@ public class SearchRepository : ISearchRepository
             cmd.Parameters.AddWithValue("limit", fetchCount);
             cmd.Parameters.AddWithValue("offset", offset);
             if (!string.IsNullOrWhiteSpace(category)) cmd.Parameters.AddWithValue("category", $"%{category}%");
+            if (!string.IsNullOrWhiteSpace(source)) cmd.Parameters.AddWithValue("source", source);
         }, ct);
 
         return BuildOffsetPage(rows, limit, offset);
@@ -185,7 +187,7 @@ public class SearchRepository : ISearchRepository
                     c.id, c.chart_id, c.chart_type, c.vars, c.db_name,
                     1 - (c.vector_dim <=> @vec::vector) AS relevance,
                     ct.title, ct.description, ct.category,
-                    d.db_source AS source
+                    d.db_source AS db_source
                 FROM public.charts c
                 LEFT JOIN public.charts_text ct
                        ON ct.chart_id = c.chart_id AND ct.lang = @lang
@@ -198,7 +200,7 @@ public class SearchRepository : ISearchRepository
             WHERE relevance > @simThreshold";
 
         if (!string.IsNullOrWhiteSpace(category)) sql += " AND category ILIKE @category";
-        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(source) = LOWER(@source)";
+        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(db_source) = LOWER(@source)";
         sql += " ORDER BY relevance DESC, id ASC LIMIT @limit OFFSET @offset;";
 
         var rows = await ExecuteRowsAsync(sql, cmd =>
@@ -209,6 +211,7 @@ public class SearchRepository : ISearchRepository
             cmd.Parameters.AddWithValue("limit", fetchCount);
             cmd.Parameters.AddWithValue("offset", offset);
             if (!string.IsNullOrWhiteSpace(category)) cmd.Parameters.AddWithValue("category", $"%{category}%");
+            if (!string.IsNullOrWhiteSpace(source)) cmd.Parameters.AddWithValue("source", source);
         }, ct);
 
         return BuildOffsetPage(rows, limit, offset);
@@ -232,7 +235,7 @@ public class SearchRepository : ISearchRepository
                 SELECT
                     c.id, c.chart_id, c.chart_type, c.vars, c.db_name, c.vector_dim,
                     ct.title, ct.description, ct.category,
-                    d.db_source AS source
+                    d.db_source AS db_source
                 FROM public.charts c
                 LEFT JOIN public.charts_text ct
                        ON ct.chart_id = c.chart_id AND ct.lang = @lang
@@ -243,7 +246,7 @@ public class SearchRepository : ISearchRepository
                 SELECT * FROM base WHERE 1=1";
 
         if (!string.IsNullOrWhiteSpace(category)) sql += " AND category ILIKE @category";
-        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(source) = LOWER(@source)";
+        if (!string.IsNullOrWhiteSpace(source)) sql += " AND LOWER(db_source) = LOWER(@source)";
 
         sql += @"
             ),
@@ -282,7 +285,7 @@ public class SearchRepository : ISearchRepository
                 FULL OUTER JOIN semantic_ranked s ON t.id = s.id
             )
             SELECT f.id, f.chart_id, f.chart_type, f.vars, f.db_name,
-                   f.title, f.description, f.category, fused.relevance
+                   f.title, f.description, f.category, f.db_source, fused.relevance
             FROM filtered f
             JOIN fused ON fused.id = f.id
             ORDER BY fused.relevance DESC, f.id ASC
@@ -300,6 +303,7 @@ public class SearchRepository : ISearchRepository
             cmd.Parameters.AddWithValue("limit", fetchCount);
             cmd.Parameters.AddWithValue("offset", offset);
             if (!string.IsNullOrWhiteSpace(category)) cmd.Parameters.AddWithValue("category", $"%{category}%");
+            if (!string.IsNullOrWhiteSpace(source)) cmd.Parameters.AddWithValue("source", source);
         }, ct);
 
         return BuildOffsetPage(rows, limit, offset);

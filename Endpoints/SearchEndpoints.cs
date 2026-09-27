@@ -12,7 +12,7 @@ public static class SearchEndpoints
            .WithTags("Chart")
            .Produces<ChartSearchResponse>(StatusCodes.Status200OK)
            .ProducesValidationProblem()
-           .ProducesProblem(StatusCodes.Status500InternalServerError);
+           .ProducesProblem(StatusCodes.Status500InternalServerError).AllowAnonymous();
         ;
     }
 
