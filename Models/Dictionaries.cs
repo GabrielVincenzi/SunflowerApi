@@ -16,6 +16,21 @@ namespace SunflowerApi.Models
         public string Payload { get; set; } = string.Empty;
     }
 
+    [Table("dictionary_entries", Schema = "public")]
+    public class DictionaryEntry
+    {
+        [Column("source_inst")]
+        public string SourceInst { get; set; } = string.Empty;
+        [Column("codelist")]
+        public string Codelist { get; set; } = string.Empty;
+        [Column("code")]
+        public string Code { get; set; } = string.Empty;
+        [Column("lang")]
+        public string Lang { get; set; } = string.Empty;
+        [Column("text")]
+        public string Text { get; set; } = string.Empty;
+    }
+
     [Table("column_descriptions", Schema = "public")]
     public class ColumnLabels
     {

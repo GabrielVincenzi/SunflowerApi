@@ -8,6 +8,7 @@ namespace SunflowerApi.Data
         public DictionaryDbContext(DbContextOptions<DictionaryDbContext> options) : base(options) { }
 
         public DbSet<ColumnLabels> ColumnLabels { get; set; } = null!;
+        public DbSet<DictionaryEntry> DictionaryEntries { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -19,6 +20,11 @@ namespace SunflowerApi.Data
                 entity.Property(c => c.ColumnCode).HasColumnName("column_code");
                 entity.Property(c => c.Lang).HasColumnName("lang");
                 entity.Property(c => c.Text).HasColumnName("full_text");
+            });
+
+            modelBuilder.Entity<DictionaryEntry>(entity =>
+            {
+                entity.HasKey(d => new { d.SourceInst, d.Codelist, d.Code, d.Lang });
             });
         }
     }

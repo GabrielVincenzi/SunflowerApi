@@ -1,3 +1,4 @@
+using System.Text.Json;
 using SunflowerApi.Repositories;
 
 namespace SunflowerApi.Services;
@@ -56,7 +57,39 @@ public class SearchService : ISearchService
             throw;
         }
 
+        await AttachVarsAndLabelsAsync(rows, lang, ct);
+
         return new ChartSearchResult(rows, nextCursor, hasMore, limit);
+    }
+
+    // Replaces row["vars"] (raw jsonb with pattern) with the codes-only tree and adds
+    // row["labels"]; both come from IDictionaryRepository.AttachLabelsAsync, which
+    // resolves labels per source (db_source) and language.
+    private async Task AttachVarsAndLabelsAsync(
+        List<Dictionary<string, object?>> rows, string lang, CancellationToken ct)
+    {
+        foreach (var row in rows)
+        {
+            if (!row.TryGetValue("vars", out var raw) || raw is null) continue;
+
+            try
+            {
+                var varsEl = raw is JsonElement je
+                    ? je
+                    : JsonDocument.Parse(raw.ToString()!).RootElement.Clone();
+
+                var dbSource = row.GetValueOrDefault("db_source")?.ToString() ?? "";
+
+                var result = await _dictionaryRepository.AttachLabelsAsync(varsEl, dbSource, lang, ct);
+                row["vars"] = result["vars"];
+                row["labels"] = result["labels"];
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Invalid vars JSON for chart {ChartId}", row.GetValueOrDefault("chart_id"));
+                row["vars"] = null;
+            }
+        }
     }
 
     private static float[]? ValidateVector(float[]? vector)

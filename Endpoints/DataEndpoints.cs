@@ -13,7 +13,7 @@ namespace SunflowerApi.Endpoints
             charts.MapGet("/getData", GetChartData)
             .CacheShared(TimeSpan.FromHours(6), CacheTags.ChartData, "database", "geos", "variables", "startPeriod", "endPeriod");
 
-            charts.MapGet("/allCharts", GetSelectedCharts)
+            charts.MapGet("/charts", GetSelectedCharts)
             .CacheShared(TimeSpan.FromMinutes(10), CacheTags.ChartLists, "category", "search", "lang", "afterId", "limit");
 
             charts.MapGet("/random", GetRandomCharts)

@@ -1,4 +1,5 @@
 using SunflowerApi.Models;
+using System.Text.Json;
 
 namespace SunflowerApi.Repositories
 {
@@ -10,5 +11,7 @@ namespace SunflowerApi.Repositories
             string lang,
             IEnumerable<string> codes,
             CancellationToken ct = default);
+
+        Task<Dictionary<string, object?>> AttachLabelsAsync(JsonElement varsElement, string source, string lang, CancellationToken ct);
     }
 }
